@@ -17,9 +17,9 @@ namespace CountryUniversities
             builder.Services.AddOpenApi();
 
             builder.Services.AddScoped<DatabaseConnection>();
-            builder.Services.AddScoped<IUniversityRepository>();
+            builder.Services.AddScoped<IUniversityRepository, UniversityRepository>();
 
-            builder.Services.AddScoped<IUniversityService>();
+            builder.Services.AddScoped<IUniversityService, UniversityService>();
 
             builder.Services.AddSwaggerGen();
             builder.Services.AddCors(options =>
