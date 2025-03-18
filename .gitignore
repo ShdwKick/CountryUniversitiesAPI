@@ -1,3 +1,5 @@
+CountryUniversities/Properties/appsettings.Development.json
+
 # Rider-specific files
 .idea/
 *.sln.iml

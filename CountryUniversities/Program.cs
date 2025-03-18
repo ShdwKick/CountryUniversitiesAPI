@@ -11,7 +11,13 @@ namespace CountryUniversities
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
+#if DEBUG
+            builder.Configuration.AddJsonFile("Properties/appsettings.Development.json", optional: false,
+                reloadOnChange: true);
+#else
+            builder.Configuration.AddJsonFile("Properties/appsettings.json", optional: false, reloadOnChange: true);
+#endif
             
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();

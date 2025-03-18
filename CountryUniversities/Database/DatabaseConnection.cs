@@ -1,27 +1,26 @@
 ﻿using CountryUniversities.DataModels;
+using CountryUniversities.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CountryUniversities.Database
 {
     public class DatabaseConnection : DbContext
     {
+        private readonly string _connectionString;
+        
         public DbSet<University> Universities { get; set; }
         public DbSet<WebPage> WebPages { get; set; }
-        public DbSet<Domain> Domains { get; set; }
 
-        public DatabaseConnection()
+        public DatabaseConnection(IConfiguration config, IUniversityService testServ)
         {
+            _connectionString = config.GetSection("AppSettings:DefaultConnection").Value;
             Database.Migrate();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-
-            //TODO: брать из конфиг файла
-            optionsBuilder.UseNpgsql(
-                "Host=localhost;Port=5433;Database=CountryUniversities;Username=postgres;Password=postgres");
-            
+            optionsBuilder.UseNpgsql(_connectionString);
         }
 
         //настройка связей между таблицами тспользуя FluentAPI
@@ -31,11 +30,6 @@ namespace CountryUniversities.Database
                 .HasMany(u => u.WebPages)
                 .WithOne(wp => wp.University)
                 .HasForeignKey(wp => wp.UniversityId);
-
-            modelBuilder.Entity<University>()
-                .HasMany(u => u.Domains)
-                .WithOne(d => d.University)
-                .HasForeignKey(d => d.UniversityId);
         }
     }
 }
