@@ -44,8 +44,17 @@ namespace CountryUniversities.Services
             {
                 tasks[i] = Task.Run(async () =>
                 {
-                    var content = await ExtractDataForCountryAsync(_countries[i]);
-                    var universities = await DeserializeCountryUniversitiesAsync(content);
+                    await _semaphore.WaitAsync();
+                    try
+                    {
+                        var content = await ExtractDataForCountryAsync(_countries[i]);
+                        var universities = await DeserializeCountryUniversitiesAsync(content);
+                        // TODO: Обработка данных
+                    }
+                    finally
+                    {
+                        _semaphore.Release();
+                    }
                 });
             }
             await Task.WhenAll(tasks);
