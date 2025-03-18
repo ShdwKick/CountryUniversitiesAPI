@@ -42,12 +42,13 @@ namespace CountryUniversities.Services
             
             for (int i = 0; i < tasks.Length; i++)
             {
+                int index = i;
                 tasks[i] = Task.Run(async () =>
                 {
                     await _semaphore.WaitAsync();
                     try
                     {
-                        var content = await ExtractDataForCountryAsync(_countries[i]);
+                        var content = await ExtractDataForCountryAsync(_countries[index]);
                         var universities = await DeserializeCountryUniversitiesAsync(content);
                         // TODO: Обработка данных
                     }
