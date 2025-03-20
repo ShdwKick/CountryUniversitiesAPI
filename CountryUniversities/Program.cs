@@ -22,7 +22,8 @@ namespace CountryUniversities
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
 
-            builder.Services.AddScoped<DatabaseConnection>();
+            builder.Services.AddDbContextFactory<DatabaseConnection>();
+            
             builder.Services.AddScoped<IUniversityRepository, UniversityRepository>();
 
             builder.Services.AddScoped<IUniversityService, UniversityService>();

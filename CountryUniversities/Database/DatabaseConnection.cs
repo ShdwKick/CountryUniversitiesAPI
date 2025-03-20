@@ -11,7 +11,7 @@ namespace CountryUniversities.Database
         public DbSet<University> Universities { get; set; }
         public DbSet<WebPage> WebPages { get; set; }
 
-        public DatabaseConnection(IConfiguration config, IUniversityService testServ)
+        public DatabaseConnection(IConfiguration config)
         {
             _connectionString = config.GetSection("AppSettings:DefaultConnection").Value;
             Database.Migrate();

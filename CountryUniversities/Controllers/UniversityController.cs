@@ -1,33 +1,35 @@
-﻿using CountryUniversities.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using CountryUniversities.Repositories;
+using CountryUniversities.Services;
+
 
 namespace CountryUniversities.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UniversityController
+    public class UniversityController : ControllerBase
     {
+        private readonly IUniversityRepository _universityRepository;
         private readonly IUniversityService _universityService;
 
-        public UniversityController(IUniversityService universityService)
+        public UniversityController(IUniversityRepository universityRepository, IUniversityService universityService)
         {
+            _universityRepository = universityRepository;
             _universityService = universityService;
         }
 
-        [HttpGet]
-        public ActionResult<bool> ExtractData()
+        [HttpPost("load")]
+        public async Task<IActionResult> LoadUniversities([FromServices] IUniversityService universityService)
         {
-            _universityService.ExtractDataForCountriesAsync();
-            return true;
+            await universityService.ExtractDataForCountriesAsync();
+            return Ok("Data loaded successfully");
         }
         
-        [HttpGet]
-        public ActionResult<bool> GetData()
+        [HttpGet("universities")]
+        public async Task<IActionResult> GetUniversities([FromQuery] string? country, [FromQuery] string? name)
         {
-            _universityService.ExtractDataForCountriesAsync();
-            return true;
+            var universities = await _universityService.GetUniversitiesAsync(country, name);
+            return Ok(universities);
         }
-        
-
     }
 }
