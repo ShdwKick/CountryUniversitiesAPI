@@ -1,4 +1,5 @@
 CountryUniversities/Properties/appsettings.Development.json
+CountryUniversities/Migrations/*
 
 # Rider-specific files
 .idea/
