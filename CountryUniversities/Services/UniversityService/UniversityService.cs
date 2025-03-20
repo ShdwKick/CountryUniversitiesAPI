@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices.Marshalling;
+using System.Text;
 using System.Text.Json;
 using CountryUniversities.DataModels;
 using CountryUniversities.DataModels.DTOs;
@@ -10,7 +11,7 @@ namespace CountryUniversities.Services
     {
         private readonly int _threadsCount;
 
-        private readonly List<string> _countries = new List<string>()
+        private readonly List<string> _countries = new()
         {
             "Afghanistan", "Russian Federation", "India", "Australia", "China", "Japan", "France", "Germany", "Brazil",
             "Canada"
@@ -31,7 +32,8 @@ namespace CountryUniversities.Services
         {
             try
             {
-                return JsonSerializer.Deserialize<List<UniversityDTO>>(jsonContent) ?? new List<UniversityDTO>();
+                using var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonContent));
+                return await JsonSerializer.DeserializeAsync<List<UniversityDTO>>(stream) ?? new List<UniversityDTO>();
             }
             catch (JsonException ex)
             {
@@ -40,15 +42,16 @@ namespace CountryUniversities.Services
             }
         }
 
+
         public async Task ExtractDataForCountriesAsync()
         {
             using var semaphore = new SemaphoreSlim(_threadsCount);
-    
+
             await Parallel.ForEachAsync(_countries, async (country, _) =>
             {
                 if (await _universityRepository.DoesCountryAlreadyExist(country))
                     return;
-                        
+
                 await semaphore.WaitAsync();
                 try
                 {
@@ -77,7 +80,7 @@ namespace CountryUniversities.Services
             {
                 var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                 response.EnsureSuccessStatusCode();
-        
+
                 return await response.Content.ReadAsStringAsync();
             }
             catch (HttpRequestException ex)
@@ -86,7 +89,7 @@ namespace CountryUniversities.Services
                 return string.Empty;
             }
         }
-        
+
         private async Task SaveUniversitiesToDbAsync(List<UniversityDTO> universityDTOs)
         {
             var universities = universityDTOs.Select(dto => new University
@@ -100,14 +103,14 @@ namespace CountryUniversities.Services
                     Url = url,
                 }).ToList()
             }).ToList();
-            
+
             await _universityRepository.AddUniversitiesAsync(universities);
         }
-        
+
         public async Task<List<UniversityDTO>> GetUniversitiesAsync(string? country, string? name)
         {
             var universities = await _universityRepository.GetUniversitiesAsync(country, name);
-    
+
             return universities.Select(u => new UniversityDTO
             {
                 Name = u.Name,
