@@ -8,5 +8,6 @@ namespace CountryUniversities.Services
         Task<List<UniversityDTO>> DeserializeCountryUniversitiesAsync(string jsonContent);
         Task ExtractDataForCountriesAsync();
         Task<string> ExtractDataForCountryAsync(string country);
+        Task<List<UniversityDTO>> GetUniversitiesAsync(string? country, string? name);
     }
 }
